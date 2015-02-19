@@ -3,6 +3,7 @@ require ("lib.yanecos.Processor")
 require ("lib.yanecos.EntityManager")
 
 require ("src.events.MouseMovedEvent")
+require ("src.events.TileSelectedEvent")
 
 class "PlayerInputProcessor" ("Processor")
 
@@ -24,6 +25,15 @@ function PlayerInputProcessor:PlayerInputProcessor (entityManager, eventManager)
 		end
 	}
 
+	self.mouseButtonReactions = {
+		MouseButtonUpEvent = function (event)
+			if self.hoveredTile then
+				self.eventManager:push (TileSelectedEvent (self.hoveredTile))
+			end
+		end
+	}
+
+	self.hoveredTile = nil
 end
 
 function PlayerInputProcessor:containsPosition (transform, size, event)
@@ -39,6 +49,7 @@ end
 local inspect = require ("lib.inspect")
 function PlayerInputProcessor:handleMouseMoved (event)
 	local tiles = self.em:findEntitiesWithTag ({"tile"})
+	self.hoveredTile = nil
 
 	for _, eid in pairs (tiles) do
 		local transform = self.em:getData (eid, TransformData:getClass ())
@@ -50,6 +61,7 @@ function PlayerInputProcessor:handleMouseMoved (event)
 		if (self:containsPosition (transform, TileData.Size, event)) then
 			animation.color.g = 0
 			animation.color.r = 255
+			self.hoveredTile = eid
 		end
 	end
 end
@@ -63,5 +75,10 @@ function PlayerInputProcessor:handle (event)
 	local mouseReaction = self.mouseMoveReactions[event:getClass ()]
 	if mouseReaction then
 		mouseReaction (event)
+	end
+
+	local mouseButtonReaction = self.mouseButtonReactions[event:getClass ()]
+	if mouseButtonReaction then
+		mouseButtonReaction (event)
 	end
 end

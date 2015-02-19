@@ -12,6 +12,7 @@ require ("src.events.MouseButtonDownEvent")
 require ("src.events.MouseButtonUpEvent")
 require ("src.events.ResizeEvent")
 require ("src.events.MouseMovedEvent")
+require ("src.events.TileSelectedEvent")
 
 require ("src.processors.TileProcessor")
 require ("src.processors.AnimationProcessor")
@@ -36,6 +37,7 @@ function Game:Game ()
 	self.eventManager:subscribe ("MouseButtonDownEvent", self)
 	self.eventManager:subscribe ("MouseButtonUpEvent", self)
 	self.eventManager:subscribe ("ResizeEvent", self)
+	self.eventManager:subscribe ("TileSelectedEvent", self)
 
 	self.assetManager:loadImage ("gfx/empty_tile.png", "gfx/tile")
 
@@ -72,6 +74,9 @@ end
 
 -- Callback used by EventManager
 function Game:handle (event)
+	if event:getClass () == "TileSelectedEvent" then
+		print ("jorp")
+	end
 end
 
 -- Updates game logic
