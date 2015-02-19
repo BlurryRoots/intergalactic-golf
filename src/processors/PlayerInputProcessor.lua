@@ -4,6 +4,9 @@ require ("lib.yanecos.EntityManager")
 
 require ("src.events.MouseMovedEvent")
 require ("src.events.TileSelectedEvent")
+require ("src.events.MenuTileSelectedEvent")
+
+require ("src.data.BuildScreenData")
 
 class "PlayerInputProcessor" ("Processor")
 
@@ -27,40 +30,52 @@ function PlayerInputProcessor:PlayerInputProcessor (entityManager, eventManager)
 
 	self.mouseButtonReactions = {
 		MouseButtonUpEvent = function (event)
-			if self.hoveredTile then
-				self.eventManager:push (TileSelectedEvent (self.hoveredTile))
+			if self.previousHoveredTileId then
+				if self.em:hasTag (self.previousHoveredTileId, "tilemenu") then
+					self.eventManager:push (MenuTileSelectedEvent (self.previousHoveredTileId))
+				else
+					self.eventManager:push (TileSelectedEvent (self.previousHoveredTileId))
+				end
 			end
 		end
 	}
 
-	self.hoveredTile = nil
+	self.previousHoveredTileId = nil
 end
 
-function PlayerInputProcessor:containsPosition (transform, size, event)
-	return transform.x < event.position.x
-		and transform.y < event.position.y
-		and event.position.x < (transform.x + size.w)
-		and event.position.y < (transform.y + size.h)
+function PlayerInputProcessor:containsPoint (transform, size, point)
+	return transform.x < point.x
+		and transform.y < point.y
+		and point.x < (transform.x + size.w)
+		and point.y < (transform.y + size.h)
 end
 
 function PlayerInputProcessor:onUpdate (dt)
 end
 
 function PlayerInputProcessor:handleMouseMoved (event)
+	-- check if map is being hovered
 	local tiles = self.em:findEntitiesWithTag ({"tile"})
-	self.hoveredTile = nil
 
 	for _, eid in pairs (tiles) do
 		local transform = self.em:getData (eid, TransformData:getClass ())
 		local animation = self.em:getData (eid, AnimationData:getClass ())
 
-		animation.color.g = 255
-		animation.color.r = 0
+		if (self:containsPoint (transform, TileData.Size, event.position)) then
+			self.eventManager:push (TileHoveredEvent (eid))
+		end
+	end
 
-		if (self:containsPosition (transform, TileData.Size, event)) then
-			animation.color.g = 0
-			animation.color.r = 255
-			self.hoveredTile = eid
+	-- check if menu
+	-- check if map is being hovered
+	local tiles = self.em:findEntitiesWithTag ({"tilemenu"})
+
+	for _, eid in pairs (tiles) do
+		local transform = self.em:getData (eid, TransformData:getClass ())
+		local animation = self.em:getData (eid, AnimationData:getClass ())
+
+		if (self:containsPoint (transform, TileData.Size, event.position)) then
+			self.eventManager:push (TileHoveredEvent (eid))
 		end
 	end
 end
@@ -79,5 +94,27 @@ function PlayerInputProcessor:handle (event)
 	local mouseButtonReaction = self.mouseButtonReactions[event:getClass ()]
 	if mouseButtonReaction then
 		mouseButtonReaction (event)
+	end
+
+	if "TileHoveredEvent" == event:getClass () then
+		if self.previousHoveredTileId then
+			self.em
+				:getData (self.previousHoveredTileId, AnimationData:getClass ())
+				.color = {r = 255, g = 255, b = 255, a = 255}
+		end
+
+		self.em
+			:getData (event.hoveredTileId, AnimationData:getClass ())
+			.color = {r = 255, g = 64, b = 64, a = 255}
+		self.previousHoveredTileId = event.hoveredTileId
+	end
+
+	if "MenuTileSelectedEvent" == event:getClass () then
+		for _, eid in pairs (self.em:findEntitiesWithTag ({"buildscreen"})) do
+			local buildscreendata =
+				self.em:getData (eid, BuildScreenData:getClass ())
+			local tile = self.em:getData (event.eid, TileData:getClass ())
+			buildscreendata.buildTileType = tile.type
+		end
 	end
 end

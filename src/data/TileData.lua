@@ -19,5 +19,5 @@ TileData.Size = {
 function TileData:TileData (x, y, type)
 	self.x = x or 0
 	self.y = y or 0
-	self.type = type
+	self.type = type or error ("I need a type!")
 end

@@ -76,6 +76,11 @@ function EntityManager:addTag (eid, tag)
 	return tag, eid
 end
 
+function EntityManager:hasTag (eid, tag)
+	return
+		self.tags[tag] and self.tags[tag][eid]
+end
+
 function EntityManager:removeTag (eid, tag)
 	for _, tag in pairs (self.tagMap[eid]) do
 		self.tags[tag][eid] = nil
@@ -128,6 +133,11 @@ function EntityManager:hasData (eid, typename)
 end
 
 function EntityManager:getData (eid, typename)
+	if not eid then error ("No id given!") end
+	if not self.dataMap[eid] then
+		error ("There is no entity with id " .. eid)
+	end
+
 	local data = self.dataMap[eid][typename]
 	if not data then
 		error ("Entity " .. eid .. " doesnt hold data of type " .. typename)

@@ -13,6 +13,7 @@ require ("src.events.MouseButtonUpEvent")
 require ("src.events.ResizeEvent")
 require ("src.events.MouseMovedEvent")
 require ("src.events.TileSelectedEvent")
+require ("src.events.TileHoveredEvent")
 
 require ("src.processors.TileProcessor")
 require ("src.processors.AnimationProcessor")
@@ -21,6 +22,7 @@ require ("src.processors.PlayerInputProcessor")
 require ("src.data.TileData")
 require ("src.data.TransformData")
 require ("src.data.AnimationData")
+require ("src.data.BuildScreenData")
 
 class "Game"
 
@@ -57,30 +59,41 @@ function Game:Game ()
 	self.eventManager:subscribe ("MouseButtonDownEvent", self.processors.Input)
 	self.eventManager:subscribe ("MouseButtonUpEvent", self.processors.Input)
 	self.eventManager:subscribe ("MouseMovedEvent", self.processors.Input)
+	self.eventManager:subscribe ("TileHoveredEvent", self.processors.Input)
+	self.eventManager:subscribe ("MenuTileSelectedEvent", self.processors.Input)
 
 	self.eventManager:subscribe ("ResizeEvent", self.processors.TileMenu)
 
-	for y = 0, 9, 1 do
-		for x = 0, 9, 1 do
+	local mapHeight = 10
+	local mapWidth = 13
+	for y = 0, mapHeight -1 , 1 do
+		for x = 0, mapWidth - 1, 1 do
 			local eid = self.entityManager:createEntity ({"tile"})
 			self.entityManager
 				:addData (eid, TransformData ())
 			self.entityManager
 				:addData (eid, TileData (x, y, TileData.Type.Grass))
 			self.entityManager
-				:addData (eid, AnimationData ("gfx/tile"))
-				.color = {r = 0, g = 255, b = 0, a = 255}
+				:addData (eid, AnimationData ("gfx/Grass"))
 		end
 	end
 
+	--local xoff = mapWidth * TileData.Size.w
 	local yoff = 0
 	for tileName, tileTyp in pairs (TileData.Type) do
 		local eid = self.entityManager:createEntity ({"tilemenu"})
-		self.entityManager:addData (eid, TransformData (0, yoff))
+		self.entityManager
+			:addData (eid, TransformData (xoff, yoff))
+		self.entityManager
+				:addData (eid, TileData (mapWidth, yoff, tileTyp))
 		self.entityManager
 			:addData (eid, AnimationData ("gfx/"..tileName))
-		yoff = yoff + TileData.Size.h
+		yoff = yoff + 1
 	end
+
+
+	local eid = self.entityManager:createEntity ({"buildscreen"})
+	self.entityManager:addData (eid, BuildScreenData ())
 end
 
 -- Raises (queues) a new event

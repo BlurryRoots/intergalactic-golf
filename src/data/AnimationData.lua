@@ -21,7 +21,7 @@ function AnimationData:AnimationData (key, frames, duration, offset, rotation, s
 	-- should it be rendered?
 	self.visible = true
 	-- color to render the animation in
-	self.color = color
+	self.color = color or {r = 255, g = 255, b = 255, a = 255}
 end
 
 function AnimationData:addChild (animation)
