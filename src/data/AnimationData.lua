@@ -15,7 +15,7 @@ function AnimationData:AnimationData (key, frames, duration, offset, rotation, s
 	-- rotation relative to the transform in the world
 	self.rotation = rotation or 0
 	-- scale relative the transform in the world
-	self.scale = scale or 1
+	self.scale = scale or {x = 1, y = 1}
 	-- to build up a composite structure (tree)
 	self.children = {}
 	-- should it be rendered?
