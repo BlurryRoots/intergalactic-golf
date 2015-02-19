@@ -3,12 +3,16 @@ require ("lib.yanecos.Data")
 
 class "TileData" ("Data")
 
+local function ct(a, p, d)
+	return {Attractiveness = a, Price = p, Difficulty = d}
+end
+
 TileData.Type = {
-	Start = 1,
-	End = 2,
-	Grass = 3,
-	Sand = 4,
-	Lake = 5,
+	Start = ct(1, 100, 1),
+	End = ct(1, 100, 1),
+	Grass = ct(0.9, 1500, 2),
+	Sand = ct(0.6, 1000, 4),
+	Lake = ct(2, 5000, 8),
 }
 
 function TileData.GetTypeName (n)

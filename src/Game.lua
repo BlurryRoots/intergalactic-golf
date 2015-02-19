@@ -108,6 +108,11 @@ end
 -- Renders stuff onto the screen
 function Game:onRender ()
 	self.processors.Animation:onRender (dt)
+	for _, eid in pairs (self.entityManager:findEntitiesWithTag ({"buildscreen"})) do
+		local buildscreendata =
+			self.entityManager:getData (eid, BuildScreenData:getClass ())
+		love.graphics.print("Total Sum: "..buildscreendata.sum, 10, 10 * TileData.Size.h + 10)
+	end
 end
 
 -- Gets called when game exits. May be used to do some clean up.

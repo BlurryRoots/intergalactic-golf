@@ -29,6 +29,9 @@ function PlayerInputProcessor:PlayerInputProcessor (entityManager, eventManager)
 			escape = function ()
 				love.event.quit()
 			end,
+			r = function ()
+				self.eventManager:push(CalculateRatingEvent ())
+			end
 		},
 	}
 
@@ -139,6 +142,14 @@ function PlayerInputProcessor:handle (event)
 				local animation = self.em:getData (event.eid, AnimationData:getClass ())
 				tile.type = buildscreendata.buildTileType
 				animation.key = "gfx/"..TileData.GetTypeName (tile.type)
+				buildscreendata.shoppingList[event.eid] = tile.type.Price
+
+				local total = 0
+				for _, price in pairs(buildscreendata.shoppingList) do
+					total = total + price
+				end
+
+				buildscreendata.sum = total
 			end
 		end
 	end
