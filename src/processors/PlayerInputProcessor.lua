@@ -7,6 +7,7 @@ require ("src.events.TileSelectedEvent")
 require ("src.events.MenuTileSelectedEvent")
 
 require ("src.data.BuildScreenData")
+require ("src.data.TileData")
 
 class "PlayerInputProcessor" ("Processor")
 
@@ -133,6 +134,11 @@ function PlayerInputProcessor:handle (event)
 				self.em:getData (eid, BuildScreenData:getClass ())
 			if not buildscreendata.buildTileType then
 				print ("choose kekse")
+			else
+				local tile = self.em:getData (event.eid, TileData:getClass ())
+				local animation = self.em:getData (event.eid, AnimationData:getClass ())
+				tile.type = buildscreendata.buildTileType
+				animation.key = "gfx/"..TileData.GetTypeName (tile.type)
 			end
 		end
 	end

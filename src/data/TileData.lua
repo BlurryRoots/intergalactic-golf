@@ -11,6 +11,16 @@ TileData.Type = {
 	Lake = 5,
 }
 
+function TileData.GetTypeName (n)
+	for name, typeN in pairs (TileData.Type) do
+		if n == typeN then
+			return name
+		end
+	end
+
+	error ("Alter!!!")
+end
+
 TileData.Size = {
 	w = 64,
 	h = 64,
