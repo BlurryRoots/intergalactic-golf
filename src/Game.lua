@@ -14,6 +14,7 @@ require ("src.events.ResizeEvent")
 require ("src.events.MouseMovedEvent")
 require ("src.events.TileSelectedEvent")
 require ("src.events.TileHoveredEvent")
+require ("src.events.CalculateRatingEvent")
 
 require ("src.processors.TileProcessor")
 require ("src.processors.AnimationProcessor")
@@ -40,6 +41,7 @@ function Game:Game ()
 	self.eventManager:subscribe ("MouseButtonUpEvent", self)
 	self.eventManager:subscribe ("ResizeEvent", self)
 	self.eventManager:subscribe ("TileSelectedEvent", self)
+	self.eventManager:subscribe ("CalculateRatingEvent", self)
 
 	self.assetManager:loadImage ("gfx/empty_tile.png", "gfx/tile")
 	self.assetManager:loadImage ("gfx/start_tile.png", "gfx/Start")
@@ -53,8 +55,6 @@ function Game:Game ()
 		Animation = AnimationProcessor (self.entityManager, self.assetManager),
 		Input = PlayerInputProcessor (self.entityManager, self.eventManager),
 	}
-
-	self.eventManager:subscribe ("ResizeEvent", self.processors.TileMenu)
 
 	local mapHeight = 10
 	local mapWidth = 13
@@ -85,7 +85,14 @@ function Game:Game ()
 
 
 	local eid = self.entityManager:createEntity ({"buildscreen"})
-	self.entityManager:addData (eid, BuildScreenData ())
+	-- Begining of buildscreen state
+	local buildscreen = BuildScreenData ()
+	buildscreen.map = {}
+	for _,eid in pairs(self.entityManager:findEntitiesWithTag({"tile"})) do
+		table.insert(buildscreen.map, eid)
+	end
+
+	self.entityManager:addData (eid, buildscreen)
 end
 
 -- Raises (queues) a new event
