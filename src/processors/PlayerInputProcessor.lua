@@ -14,6 +14,15 @@ function PlayerInputProcessor:PlayerInputProcessor (entityManager, eventManager)
 	self.em = entityManager
 	self.eventManager = eventManager
 
+	self.eventManager:subscribe ("KeyboardKeyUpEvent", self)
+	self.eventManager:subscribe ("KeyboardKeyDownEvent", self)
+	self.eventManager:subscribe ("MouseButtonDownEvent", self)
+	self.eventManager:subscribe ("MouseButtonUpEvent", self)
+	self.eventManager:subscribe ("MouseMovedEvent", self)
+	self.eventManager:subscribe ("TileHoveredEvent", self)
+	self.eventManager:subscribe ("MenuTileSelectedEvent", self)
+	self.eventManager:subscribe ("TileSelectedEvent", self)
+
 	self.keyReactions = {
 		KeyboardKeyUpEvent =  {
 			escape = function ()
@@ -115,6 +124,16 @@ function PlayerInputProcessor:handle (event)
 				self.em:getData (eid, BuildScreenData:getClass ())
 			local tile = self.em:getData (event.eid, TileData:getClass ())
 			buildscreendata.buildTileType = tile.type
+		end
+	end
+
+	if "TileSelectedEvent" == event:getClass () then
+		for _, eid in pairs (self.em:findEntitiesWithTag ({"buildscreen"})) do
+			local buildscreendata =
+				self.em:getData (eid, BuildScreenData:getClass ())
+			if not buildscreendata.buildTileType then
+				print ("choose kekse")
+			end
 		end
 	end
 end

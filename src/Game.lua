@@ -54,14 +54,6 @@ function Game:Game ()
 		Input = PlayerInputProcessor (self.entityManager, self.eventManager),
 	}
 
-	self.eventManager:subscribe ("KeyboardKeyUpEvent", self.processors.Input)
-	self.eventManager:subscribe ("KeyboardKeyDownEvent", self.processors.Input)
-	self.eventManager:subscribe ("MouseButtonDownEvent", self.processors.Input)
-	self.eventManager:subscribe ("MouseButtonUpEvent", self.processors.Input)
-	self.eventManager:subscribe ("MouseMovedEvent", self.processors.Input)
-	self.eventManager:subscribe ("TileHoveredEvent", self.processors.Input)
-	self.eventManager:subscribe ("MenuTileSelectedEvent", self.processors.Input)
-
 	self.eventManager:subscribe ("ResizeEvent", self.processors.TileMenu)
 
 	local mapHeight = 10
@@ -103,9 +95,6 @@ end
 
 -- Callback used by EventManager
 function Game:handle (event)
-	if event:getClass () == "TileSelectedEvent" then
-		print ("jorp")
-	end
 end
 
 -- Updates game logic
