@@ -17,7 +17,6 @@ require ("src.events.TileSelectedEvent")
 require ("src.processors.TileProcessor")
 require ("src.processors.AnimationProcessor")
 require ("src.processors.PlayerInputProcessor")
-require ("src.processors.TileMenuProcessor")
 
 require ("src.data.TileData")
 require ("src.data.TransformData")
@@ -41,12 +40,16 @@ function Game:Game ()
 	self.eventManager:subscribe ("TileSelectedEvent", self)
 
 	self.assetManager:loadImage ("gfx/empty_tile.png", "gfx/tile")
+	self.assetManager:loadImage ("gfx/start_tile.png", "gfx/Start")
+	self.assetManager:loadImage ("gfx/end_tile.png", "gfx/End")
+	self.assetManager:loadImage ("gfx/grass_tile.png", "gfx/Grass")
+	self.assetManager:loadImage ("gfx/sand_tile.png", "gfx/Sand")
+	self.assetManager:loadImage ("gfx/lake_tile.png", "gfx/Lake")
 
 	self.processors = {
 		Tile = TileProcessor (self.entityManager),
 		Animation = AnimationProcessor (self.entityManager, self.assetManager),
 		Input = PlayerInputProcessor (self.entityManager, self.eventManager),
-		TileMenu = TileMenuProcessor (self.entityManager, self.assetManager)
 	}
 
 	self.eventManager:subscribe ("KeyboardKeyUpEvent", self.processors.Input)
@@ -70,20 +73,14 @@ function Game:Game ()
 		end
 	end
 
-	--local menuEid = self.entityManager:createEntity ({"tilemenu"})
-	--self.entityManager
-	--	:addData (menuEid, TransformData ())
-	--self.entityManager
-	--	:addData (menuEid, TileSelectionMenuData (TileData.Type, {width = 256, height = 512}))
-
-	--local yoff = 0
-	--for _, tileTyp in pairs (TileData.Type) do
-	--	local eid = self.entityManager:createEntity ({"tile"})
-	--	self.entityManager:addData (eid, TransformData ())
-	--	self.entityManager
-	--		:addData (eid, AnimationData ("gfx/tile"))
-	--		.color = {r = }
-	--end
+	local yoff = 0
+	for tileName, tileTyp in pairs (TileData.Type) do
+		local eid = self.entityManager:createEntity ({"tilemenu"})
+		self.entityManager:addData (eid, TransformData (0, yoff))
+		self.entityManager
+			:addData (eid, AnimationData ("gfx/"..tileName))
+		yoff = yoff + TileData.Size.h
+	end
 end
 
 -- Raises (queues) a new event
@@ -104,7 +101,6 @@ function Game:onUpdate (dt)
 
 	self.processors.Tile:onUpdate (dt)
 	self.processors.Animation:onUpdate (dt)
-	--self.processors.TileMenu:onUpdate (dt)
 end
 
 -- Renders stuff onto the screen

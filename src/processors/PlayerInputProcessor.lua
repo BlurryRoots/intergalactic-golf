@@ -46,7 +46,6 @@ end
 function PlayerInputProcessor:onUpdate (dt)
 end
 
-local inspect = require ("lib.inspect")
 function PlayerInputProcessor:handleMouseMoved (event)
 	local tiles = self.em:findEntitiesWithTag ({"tile"})
 	self.hoveredTile = nil
