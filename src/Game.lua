@@ -11,9 +11,11 @@ require ("src.events.KeyboardKeyUpEvent")
 require ("src.events.MouseButtonDownEvent")
 require ("src.events.MouseButtonUpEvent")
 require ("src.events.ResizeEvent")
+require ("src.events.MouseMovedEvent")
 
 require ("src.processors.TileProcessor")
 require ("src.processors.AnimationProcessor")
+require ("src.processors.PlayerInputProcessor")
 
 require ("src.data.TileData")
 require ("src.data.TransformData")
@@ -39,11 +41,18 @@ function Game:Game ()
 
 	self.processors = {
 		Tile = TileProcessor (self.entityManager),
-		Animation = AnimationProcessor (self.entityManager, self.assetManager)
+		Animation = AnimationProcessor (self.entityManager, self.assetManager),
+		Input = PlayerInputProcessor (self.entityManager, self.eventManager)
 	}
 
-	for y = 0, 10, 1 do
-		for x = 0, 10, 1 do
+	self.eventManager:subscribe ("KeyboardKeyUpEvent", self.processors.Input)
+	self.eventManager:subscribe ("KeyboardKeyDownEvent", self.processors.Input)
+	self.eventManager:subscribe ("MouseButtonDownEvent", self.processors.Input)
+	self.eventManager:subscribe ("MouseButtonUpEvent", self.processors.Input)
+	self.eventManager:subscribe ("MouseMovedEvent", self.processors.Input)
+
+	for y = 0, 9, 1 do
+		for x = 0, 9, 1 do
 			local eid = self.entityManager:createEntity ({"tile"})
 			self.entityManager
 				:addData (eid, TransformData ())
@@ -75,7 +84,7 @@ end
 
 -- Renders stuff onto the screen
 function Game:onRender ()
-	self.processors.Animation:onUpdate (dt)
+	self.processors.Animation:onRender (dt)
 end
 
 -- Gets called when game exits. May be used to do some clean up.

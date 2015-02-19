@@ -13,15 +13,6 @@ function TileProcessor:TileProcessor (entityManager)
 		TileData:getClass (),
 	}
 
-	self.mapOffset = {
-		x = 0,
-		y = 0
-	}
-
-	self.tileSize = {
-		w = 32,
-		h = 32
-	}
 end
 
 function TileProcessor:onUpdate (dt)
@@ -31,8 +22,8 @@ function TileProcessor:onUpdate (dt)
 		local tile = self.em:getData (eid, TileData:getClass ())
 		local transform = self.em:getData (eid, TransformData:getClass ())
 
-		transform.x = self.tileSize.w * tile.x
-		transform.y = self.tileSize.h * tile.y
+		transform.x = TileData.Size.w * tile.x
+		transform.y = TileData.Size.h * tile.y
 	end
 end
 

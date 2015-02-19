@@ -38,6 +38,10 @@ function love.mousereleased (x, y, button)
 	gameInstance:raise (MouseButtonUpEvent (x, y, button))
 end
 
+function love.mousemoved(x, y, dx, dy)
+	gameInstance:raise (MouseMovedEvent (x, y, dx, dy))
+end
+
 function love.keypressed (key)
 	gameInstance:raise (KeyboardKeyDownEvent (key))
 end

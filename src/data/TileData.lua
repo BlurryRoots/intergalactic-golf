@@ -11,6 +11,11 @@ TileData.Type = {
 	Lake = 5,
 }
 
+TileData.Size = {
+	w = 64,
+	h = 64,
+}
+
 function TileData:TileData (x, y, type)
 	self.x = x or 0
 	self.y = y or 0
