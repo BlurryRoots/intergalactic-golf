@@ -1,4 +1,6 @@
 require ("lib.lclass")
+require ("lib.yagl.AssetManager")
+require ("lib.yanecos.EntityManager")
 
 require ("src.EventManager")
 
@@ -10,11 +12,16 @@ require ("src.events.MouseButtonDownEvent")
 require ("src.events.MouseButtonUpEvent")
 require ("src.events.ResizeEvent")
 
+require ("src.processors.TileProcessor")
+require ("src.processors.AnimationProcessor")
+
 class "Game"
 
 -- Constructs a new game
 function Game:Game ()
 	self.eventManager = EventManager ()
+	self.assetManager = AssetManager ()
+	self.entityManager = EntityManager ()
 
 	self.eventManager:subscribe ("FocusGainedEvent", self)
 	self.eventManager:subscribe ("FocusLostEvent", self)
@@ -23,6 +30,11 @@ function Game:Game ()
 	self.eventManager:subscribe ("MouseButtonDownEvent", self)
 	self.eventManager:subscribe ("MouseButtonUpEvent", self)
 	self.eventManager:subscribe ("ResizeEvent", self)
+
+	self.processors = {
+		Tile = TileProcessor (self.entityManager),
+		Animation = AnimationProcessor (self.entityManager, self.assetManager)
+	}
 end
 
 -- Raises (queues) a new event
@@ -37,11 +49,14 @@ end
 -- Updates game logic
 function Game:onUpdate (dt)
 	self.eventManager:update (dt)
+
+	self.processors.Tile:onUpdate (dt)
+	self.processors.Animation:onUpdate (dt)
 end
 
 -- Renders stuff onto the screen
 function Game:onRender ()
-	--
+	self.processors.Animation:onUpdate (dt)
 end
 
 -- Gets called when game exits. May be used to do some clean up.
