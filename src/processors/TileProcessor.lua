@@ -3,6 +3,7 @@ require ("lib.yanecos.Processor")
 
 require ("src.data.TileData")
 require ("src.data.AnimationData")
+require ("src.data.TransformData")
 
 class "TileProcessor" ("Processor")
 
@@ -30,8 +31,8 @@ function TileProcessor:onUpdate (dt)
 		local tile = self.em:getData (eid, TileData:getClass ())
 		local transform = self.em:getData (eid, TransformData:getClass ())
 
-		transform.x = self.tileSize * tile.x
-		transform.y = self.tileSize * tile.y
+		transform.x = self.tileSize.w * tile.x
+		transform.y = self.tileSize.h * tile.y
 	end
 end
 

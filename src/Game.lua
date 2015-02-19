@@ -15,6 +15,10 @@ require ("src.events.ResizeEvent")
 require ("src.processors.TileProcessor")
 require ("src.processors.AnimationProcessor")
 
+require ("src.data.TileData")
+require ("src.data.TransformData")
+require ("src.data.AnimationData")
+
 class "Game"
 
 -- Constructs a new game
@@ -31,10 +35,25 @@ function Game:Game ()
 	self.eventManager:subscribe ("MouseButtonUpEvent", self)
 	self.eventManager:subscribe ("ResizeEvent", self)
 
+	self.assetManager:loadImage ("gfx/empty_tile.png", "gfx/tile")
+
 	self.processors = {
 		Tile = TileProcessor (self.entityManager),
 		Animation = AnimationProcessor (self.entityManager, self.assetManager)
 	}
+
+	for y = 0, 10, 1 do
+		for x = 0, 10, 1 do
+			local eid = self.entityManager:createEntity ({"tile"})
+			self.entityManager
+				:addData (eid, TransformData ())
+			self.entityManager
+				:addData (eid, TileData (x, y, TileData.Type.Grass))
+			self.entityManager
+				:addData (eid, AnimationData ("gfx/tile"))
+				.color = {r = 0, g = 255, b = 0, a = 255}
+		end
+	end
 end
 
 -- Raises (queues) a new event
