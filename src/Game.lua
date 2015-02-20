@@ -38,8 +38,8 @@ function Game:Game ()
 
 	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Grass")
 	self.assets:loadImage ("gfx/bush_tile.png", "gfx/tile/Bush")
-	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Plain")
-	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Barren")
+	self.assets:loadImage ("gfx/plain_tile.png", "gfx/tile/Plain")
+	self.assets:loadImage ("gfx/barren_tile.png", "gfx/tile/Barren")
 
 	self.assets:loadImage ("gfx/empty_tile.png", "gfx/tile/Empty")
 	self.assets:loadImage ("gfx/end_tile.png", "gfx/tile/End")
@@ -52,7 +52,7 @@ function Game:Game ()
 	local gd =
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
-	gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Tropical)
+	gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Temperate)
 
 	self.buildModeProcessor = BuildModeProcessor (self.entities, self.events, self.assets)
 	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))
