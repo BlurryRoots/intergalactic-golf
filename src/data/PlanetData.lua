@@ -29,16 +29,16 @@ addBiome (PlanetData.Biomes,  90000, 0.9, "Tundra", "Barren")
 
 PlanetData.TileType = {}
 -- defaults for biomes
-addTileType (PlanetData.TileType, 1500, 0.5, 1, "Grass")
-addTileType (PlanetData.TileType, 1500, 0.5, 1, "Bush")
-addTileType (PlanetData.TileType, 1500, 0.5, 1, "Plain")
-addTileType (PlanetData.TileType, 1000, 0.3, 1, "Barren")
+addTileType (PlanetData.TileType, 1500, 0.0, 0.6, "Grass")
+addTileType (PlanetData.TileType, 1500, 0.0, 0.6, "Bush")
+addTileType (PlanetData.TileType, 1500, 0.0, 0.6, "Plain")
+addTileType (PlanetData.TileType, 1000, 0.0, 0.6, "Barren")
 -- additional tiles to build
-addTileType (PlanetData.TileType,  250, 1.0, 1, "Start")
-addTileType (PlanetData.TileType,  250, 1.0, 1, "End")
-addTileType (PlanetData.TileType, 1500, 0.5, 1, "Lawn")
-addTileType (PlanetData.TileType, 1000, 0.3, 1, "Sand")
-addTileType (PlanetData.TileType, 5000, 0.9, 1, "Lake")
+addTileType (PlanetData.TileType,  250, 1.0, 0.0, "Start")
+addTileType (PlanetData.TileType,  250, 1.0, 0.0, "End")
+addTileType (PlanetData.TileType, 1500, 0.5, 0.2, "Lawn")
+addTileType (PlanetData.TileType, 1000, 0.3, 0.7, "Sand")
+addTileType (PlanetData.TileType, 5000, 0.9, 1.0, "Lake")
 
 PlanetData.MapSize = {
 	Width = 13,

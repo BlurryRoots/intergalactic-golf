@@ -53,10 +53,13 @@ function Game:Game ()
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
 
-	gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Temperate)
+	self.gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Temperate)
 	self.gd.population = 100000
+	self.gd.money = 0
+	self.gd.planets["Knurpsel"].bought = true
 
-	self.buildModeProcessor = BuildModeProcessor (self.entities, self.events, self.assets)
+	self.buildModeProcessor =
+		BuildModeProcessor (self.entities, self.events, self.assets)
 	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))
 
 	self.animationProcessor = AnimationProcessor (self.entities, self.assets)
@@ -85,9 +88,11 @@ function Game:onUpdate (dt)
 	self.buildModeProcessor:onUpdate (dt)
 	self.inputProcessor:onUpdate (dt)
 
+	local moneyfactor = 10
 	for _,planet in pairs(self.gd.planets) do
 		if planet.bought then
-
+			local rating = self.buildModeProcessor:calculateRating (planet.map)
+			self.gd.money = self.gd.money + rating * dt * moneyfactor
 		end
 	end
 end
@@ -97,6 +102,8 @@ function Game:onRender ()
 	self.buildModeProcessor:onRender ()
 	self.animationProcessor:onRender ()
 	self.inputProcessor:onRender ()
+
+	love.graphics.print ("money: " .. self.gd.money, 32, 720)
 end
 
 -- Gets called when game exits. May be used to do some clean up.

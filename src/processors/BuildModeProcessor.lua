@@ -39,9 +39,7 @@ function BuildModeProcessor:onUpdate (dt)
 		end
 	end
 
-	self.rating = 0
-
-	self.rating = self:CalculateRating(self.buildmap) * self.currentPlanet.biome.attractiveness
+	self.rating = self:calculateRating(self.buildmap)
 end
 
 function BuildModeProcessor:onRender ()
@@ -165,7 +163,7 @@ function BuildModeProcessor:endBuildMode (event)
 	self.events:unsubscribe ("MouseButtonUpEvent", self)
 end
 
-function BuildModeProcessor:CalculateRating (buildmap)
+function BuildModeProcessor:calculateRating (buildmap)
 	local difficulty = 0
 	local attractiveness = 0
 	for y = 1, PlanetData.MapSize.Height do
@@ -180,7 +178,9 @@ function BuildModeProcessor:CalculateRating (buildmap)
 		if maxDif < tile.difficulty then maxDif = tile.difficulty end
 	end
 	local maximumDifficulty = maxDif * mapSize
-	return attractiveness * (maximumDifficulty / difficulty)
+	return attractiveness
+		* (1 - (difficulty / maximumDifficulty))
+		* self.currentPlanet.biome.attractiveness
 end
 
 function BuildModeProcessor:checkHover (event)
