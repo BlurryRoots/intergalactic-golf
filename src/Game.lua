@@ -17,6 +17,7 @@ require ("src.events.ResizeEvent")
 
 require ("src.data.AnimationData")
 require ("src.data.GameData")
+require ("src.data.HitboxData")
 require ("src.data.PlanetData")
 require ("src.data.TransformData")
 

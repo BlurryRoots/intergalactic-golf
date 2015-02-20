@@ -35,6 +35,11 @@ function BuildModeProcessor:startBuildMode (event)
 
 			local key = "gfx/tile/" .. tile.name
 			local animation = self.entities:addData (eid, AnimationData (key))
+
+			local hitbox = self.entities:addData (
+				eid,
+				HitboxData (PlanetData.TileSize, PlanetData.TileSize)
+			)
 		end
 	end
 end
