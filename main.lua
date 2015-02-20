@@ -1,3 +1,13 @@
+require ("src.events.FocusGainedEvent")
+require ("src.events.FocusLostEvent")
+require ("src.events.KeyboardKeyDownEvent")
+require ("src.events.KeyboardKeyUpEvent")
+require ("src.events.MouseButtonDownEvent")
+require ("src.events.MouseButtonUpEvent")
+require ("src.events.MouseMovedEvent")
+require ("src.events.PlaySoundEvent")
+require ("src.events.ResizeEvent")
+
 require ("src.Game")
 
 local gameInstance = nil

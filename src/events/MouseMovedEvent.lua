@@ -12,5 +12,4 @@ function MouseMovedEvent:MouseMovedEvent (x, y, dx, dy)
 		x = dx,
 		y = dy,
 	}
-
 end

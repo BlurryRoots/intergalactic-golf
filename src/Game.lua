@@ -1,103 +1,98 @@
 require ("lib.lclass")
-require ("lib.yagl.AssetManager")
 require ("lib.yanecos.EntityManager")
+require ("lib.yagl.AssetManager")
 
 require ("src.EventManager")
 
-require ("src.events.FocusGainedEvent")
-require ("src.events.FocusLostEvent")
-require ("src.events.KeyboardKeyDownEvent")
-require ("src.events.KeyboardKeyUpEvent")
-require ("src.events.MouseButtonDownEvent")
-require ("src.events.MouseButtonUpEvent")
-require ("src.events.ResizeEvent")
-require ("src.events.MouseMovedEvent")
-require ("src.events.TileSelectedEvent")
-require ("src.events.TileHoveredEvent")
-require ("src.events.CalculateRatingEvent")
+require ("src.events.BuildModeEndEvent")
+require ("src.events.BuildModeStartEvent")
+require ("src.events.PlanetOverviewStartEvent")
+require ("src.events.PlanetOverviewEndEvent")
 
-require ("src.processors.TileProcessor")
-require ("src.processors.AnimationProcessor")
-require ("src.processors.PlayerInputProcessor")
-
-require ("src.data.TileData")
-require ("src.data.TransformData")
 require ("src.data.AnimationData")
-require ("src.data.BuildScreenData")
+require ("src.data.GameData")
+require ("src.data.HitboxData")
+require ("src.data.PlanetData")
+require ("src.data.TransformData")
+
+require ("src.processors.AnimationProcessor")
+require ("src.processors.BuildModeProcessor")
+require ("src.processors.MovementProcessor")
+require ("src.processors.PlanetOverviewProcessor")
+require ("src.processors.PlayerInputProcessor")
+require ("src.processors.SoundProcessor")
+
+local inspect = require ("lib.inspect")
 
 class "Game"
 
 -- Constructs a new game
 function Game:Game ()
-	self.eventManager = EventManager ()
-	self.assetManager = AssetManager ()
-	self.entityManager = EntityManager ()
+	self.events = EventManager ()
+	self.events:subscribe ("FocusGainedEvent", self)
+	self.events:subscribe ("FocusLostEvent", self)
+	self.events:subscribe ("KeyboardKeyDownEvent", self)
+	self.events:subscribe ("KeyboardKeyUpEvent", self)
+	self.events:subscribe ("MouseButtonDownEvent", self)
+	self.events:subscribe ("MouseButtonUpEvent", self)
+	self.events:subscribe ("ResizeEvent", self)
 
-	self.eventManager:subscribe ("FocusGainedEvent", self)
-	self.eventManager:subscribe ("FocusLostEvent", self)
-	self.eventManager:subscribe ("KeyboardKeyDownEvent", self)
-	self.eventManager:subscribe ("KeyboardKeyUpEvent", self)
-	self.eventManager:subscribe ("MouseButtonDownEvent", self)
-	self.eventManager:subscribe ("MouseButtonUpEvent", self)
-	self.eventManager:subscribe ("ResizeEvent", self)
-	self.eventManager:subscribe ("TileSelectedEvent", self)
-	self.eventManager:subscribe ("CalculateRatingEvent", self)
+	self.assets = AssetManager ()
 
-	self.assetManager:loadImage ("gfx/empty_tile.png", "gfx/tile")
-	self.assetManager:loadImage ("gfx/start_tile.png", "gfx/Start")
-	self.assetManager:loadImage ("gfx/end_tile.png", "gfx/End")
-	self.assetManager:loadImage ("gfx/grass_tile.png", "gfx/Grass")
-	self.assetManager:loadImage ("gfx/sand_tile.png", "gfx/Sand")
-	self.assetManager:loadImage ("gfx/lake_tile.png", "gfx/Lake")
+	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Grass")
+	self.assets:loadImage ("gfx/bush_tile.png", "gfx/tile/Bush")
+	self.assets:loadImage ("gfx/plain_tile.png", "gfx/tile/Plain")
+	self.assets:loadImage ("gfx/barren_tile.png", "gfx/tile/Barren")
 
-	self.processors = {
-		Tile = TileProcessor (self.entityManager),
-		Animation = AnimationProcessor (self.entityManager, self.assetManager),
-		Input = PlayerInputProcessor (self.entityManager, self.eventManager),
-	}
+	self.assets:loadImage ("gfx/empty_tile.png", "gfx/tile/Empty")
+	self.assets:loadImage ("gfx/end_tile.png", "gfx/tile/End")
+	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Lawn")
+	self.assets:loadImage ("gfx/lake_tile.png", "gfx/tile/Lake")
+	self.assets:loadImage ("gfx/sand_tile.png", "gfx/tile/Sand")
+	self.assets:loadImage ("gfx/start_tile.png", "gfx/tile/Start")
 
-	local mapHeight = 10
-	local mapWidth = 13
-	for y = 0, mapHeight -1 , 1 do
-		for x = 0, mapWidth - 1, 1 do
-			local eid = self.entityManager:createEntity ({"tile"})
-			self.entityManager
-				:addData (eid, TransformData ())
-			self.entityManager
-				:addData (eid, TileData (x, y, TileData.Type.Grass))
-			self.entityManager
-				:addData (eid, AnimationData ("gfx/Grass"))
-		end
-	end
+	self.assets:loadImage ("gfx/planet.png", "gfx/Planet")
+	self.assets:loadImage ("gfx/bg.png", "gfx/Background")
 
-	--local xoff = mapWidth * TileData.Size.w
-	local yoff = 0
-	for tileName, tileTyp in pairs (TileData.Type) do
-		local eid = self.entityManager:createEntity ({"tilemenu"})
-		self.entityManager
-			:addData (eid, TransformData (xoff, yoff))
-		self.entityManager
-				:addData (eid, TileData (mapWidth, yoff, tileTyp))
-		self.entityManager
-			:addData (eid, AnimationData ("gfx/"..tileName))
-		yoff = yoff + 1
-	end
+	self.entities = EntityManager ()
+	self.gd =
+		self.entities
+			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
+	self.gd.lastmsg = ""
+	self.gd.resolution = {w = 1280, h = 920}
+	self.gd.population = 100000
+	self.gd.money = 120000
+	self.gd.planets["Knurpsel1"] = PlanetData (PlanetData.Biomes.Tundra)
+	self.gd.planets["Knurpsel1"].name = "Knurpsel1"
+	self.gd.planets["Knurpsel2"] = PlanetData (PlanetData.Biomes.Tropical)
+	self.gd.planets["Knurpsel2"].name = "Knurpsel2"
+	self.gd.planets["Knurpsel3"] = PlanetData (PlanetData.Biomes.Grassland)
+	self.gd.planets["Knurpsel3"].name = "Knurpsel3"
+	self.gd.planets["Knurpsel4"] = PlanetData (PlanetData.Biomes.Temperate)
+	self.gd.planets["Knurpsel4"].name = "Knurpsel4"
 
+	self.buildModeProcessor =
+		BuildModeProcessor (self.entities, self.events, self.assets)
+	--self.buildModeProcessor:handle (BuildModeStartEvent ("Knurpsel4"))
 
-	local eid = self.entityManager:createEntity ({"buildscreen"})
-	-- Begining of buildscreen state
-	local buildscreen = BuildScreenData ()
-	buildscreen.map = {}
-	for _,eid in pairs(self.entityManager:findEntitiesWithTag({"tile"})) do
-		table.insert(buildscreen.map, eid)
-	end
+	self.planetOverviewProcessor =
+		PlanetOverviewProcessor (self.entities, self.events, self.assets)
+	local e = PlanetOverviewStartEvent ()
+	self.planetOverviewProcessor:handle (e)
 
-	self.entityManager:addData (eid, buildscreen)
+	self.animationProcessor = AnimationProcessor (self.entities, self.assets)
+
+	self.inputProcessor = PlayerInputProcessor (self.entities, self.events)
+	self.events:subscribe ("KeyboardKeyDownEvent", self.inputProcessor)
+	self.events:subscribe ("KeyboardKeyUpEvent", self.inputProcessor)
+	self.events:subscribe ("MouseButtonDownEvent", self.inputProcessor)
+	self.events:subscribe ("MouseButtonUpEvent", self.inputProcessor)
+	self.events:subscribe ("MouseMovedEvent", self.inputProcessor)
 end
 
 -- Raises (queues) a new event
 function Game:raise (event)
-	self.eventManager:push (event)
+	self.events:push (event)
 end
 
 -- Callback used by EventManager
@@ -106,20 +101,30 @@ end
 
 -- Updates game logic
 function Game:onUpdate (dt)
-	self.eventManager:update (dt)
+	self.events:update (dt)
 
-	self.processors.Tile:onUpdate (dt)
-	self.processors.Animation:onUpdate (dt)
+	self.buildModeProcessor:onUpdate (dt)
+	self.inputProcessor:onUpdate (dt)
+	self.planetOverviewProcessor:onUpdate (dt)
+
+	local moneyfactor = 10
+	for _,planet in pairs(self.gd.planets) do
+		if planet.bought then
+			local rating = self.buildModeProcessor:calculateRating (planet)
+			self.gd.money = self.gd.money + rating * dt * moneyfactor
+		end
+	end
 end
 
 -- Renders stuff onto the screen
 function Game:onRender ()
-	self.processors.Animation:onRender (dt)
-	for _, eid in pairs (self.entityManager:findEntitiesWithTag ({"buildscreen"})) do
-		local buildscreendata =
-			self.entityManager:getData (eid, BuildScreenData:getClass ())
-		love.graphics.print("Total Sum: "..buildscreendata.sum, 10, 10 * TileData.Size.h + 10)
-	end
+	self.buildModeProcessor:onRender ()
+	self.animationProcessor:onRender ()
+	self.inputProcessor:onRender ()
+	self.planetOverviewProcessor:onRender ()
+
+	love.graphics.print ("money: " .. self.gd.money, 32, 720)
+	love.graphics.print ("last message: " .. self.gd.lastmsg, 32, 780)
 end
 
 -- Gets called when game exits. May be used to do some clean up.

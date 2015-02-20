@@ -195,3 +195,14 @@ function EntityManager:findEntitiesWithTag (taglist)
 
 	return entities
 end
+
+function EntityManager:firstEntityWithTag (taglist)
+	-- fetch all entities matching taglist
+	local entities = self:findEntitiesWithTag (taglist)
+	if 0 == #entities then
+		error ("No entity with given tags")
+	end
+
+	-- pop first table element
+	return table.remove (entities, 1)
+end
