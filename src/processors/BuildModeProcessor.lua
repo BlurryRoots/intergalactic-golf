@@ -72,6 +72,16 @@ function BuildModeProcessor:startBuildMode (event)
 		end
 	end
 
+	self.tilemenu = {}
+	for _, tile in pairs (PlanetData.TileType) do
+		local ani =
+			bganimation:addChild (AnimationData ("gfx/tile/"..tile.name))
+		ani.offset.x = PlanetData.MapSize.Width + 1
+		ani.offset.y = #self.tilemenu
+
+		table.insert (self.tilemenu, ani)
+	end
+
 	self.events:subscribe ("MouseMovedEvent", self)
 end
 
