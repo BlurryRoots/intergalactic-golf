@@ -49,11 +49,11 @@ function Game:Game ()
 	self.assets:loadImage ("gfx/start_tile.png", "gfx/tile/Start")
 
 	self.entities = EntityManager ()
-	local gd =
+	self.gd =
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
-	gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Tropical)
-	gd.population = 100000
+	self.gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Tropical)
+	self.gd.population = 100000
 
 	self.buildModeProcessor = BuildModeProcessor (self.entities, self.events, self.assets)
 	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))
@@ -83,6 +83,12 @@ function Game:onUpdate (dt)
 
 	self.buildModeProcessor:onUpdate (dt)
 	self.inputProcessor:onUpdate (dt)
+
+	for _,planet in pairs(self.gd.planets) do
+		if planet.bought then
+
+		end
+	end
 end
 
 -- Renders stuff onto the screen
