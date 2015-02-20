@@ -74,8 +74,8 @@ function PlanetOverviewProcessor:startOverview (event)
 	end
 
 	for i, planet in pairs (self.planetanimations) do
-		planet.offset.x = 0.0
-		planet.offset.y = 0.0
+		planet.offset.x = 4.5
+		planet.offset.y = 3.0
 	end
 	-- create animation tree
 end
