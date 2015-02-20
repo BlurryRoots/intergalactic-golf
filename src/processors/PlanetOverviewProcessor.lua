@@ -51,16 +51,19 @@ function PlanetOverviewProcessor:startOverview (event)
 	-- register event handlers
 	self.events:subscribe ("MouseButtonDownEvent", self)
 
-	-- create base entity (visual)
-	local eid = self.entities:createEntity ({"planet-overview"})
-	print ("event is " .. inspect (TransformData))
-	self.entities:addData (eid, TransformData (0, 0))
-
-	local bganimation = self.entities:addData (eid, AnimationData ("gfx/Background"))
 	local gamedata = self.entities:getData (
 		self.entities:firstEntityWithTag ({"gamedata"}),
 		GameData:getClass ()
 	)
+
+	-- create base entity (visual)
+	local eid = self.entities:createEntity ({"planet-overview"})
+	print ("event is " .. inspect (TransformData))
+	self.entities:addData (eid, TransformData (gamedata.resolution.w / 2, gamedata.resolution.h))
+
+	local bganimation = self.entities:addData (eid, AnimationData ("gfx/Background"))
+	bganimation.offset.x = -0.5
+	bganimation.offset.y = -0.5
 
 	self.planetanimations = {}
 	for _, planets in pairs (gamedata) do

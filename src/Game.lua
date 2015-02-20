@@ -58,7 +58,7 @@ function Game:Game ()
 	self.gd =
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
-
+	self.gd.resolution = {w = 1280, h = 920}
 	self.gd.population = 100000
 	self.gd.money = 0
 	self.gd.planets["Knurpsel1"] = PlanetData (PlanetData.Biomes.Tundra)
