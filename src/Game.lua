@@ -66,6 +66,12 @@ function Game:Game ()
 	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))
 
 	self.animationProcessor = AnimationProcessor (self.entities, self.assets)
+
+	self.inputProcessor = PlayerInputProcessor (self.entities, self.events)
+	self.events:subscribe ("KeyboardKeyDownEvent", self.inputProcessor)
+	self.events:subscribe ("KeyboardKeyUpEvent", self.inputProcessor)
+	self.events:subscribe ("MouseButtonDownEvent", self.inputProcessor)
+	self.events:subscribe ("MouseButtonUpEvent", self.inputProcessor)
 end
 
 -- Raises (queues) a new event
@@ -82,12 +88,14 @@ function Game:onUpdate (dt)
 	self.events:update (dt)
 
 	self.buildModeProcessor:onUpdate (dt)
+	self.inputProcessor:onUpdate (dt)
 end
 
 -- Renders stuff onto the screen
 function Game:onRender ()
 	self.buildModeProcessor:onRender ()
 	self.animationProcessor:onRender ()
+	self.inputProcessor:onRender ()
 end
 
 -- Gets called when game exits. May be used to do some clean up.
