@@ -12,6 +12,19 @@ function BuildModeProcessor:BuildModeProcessor (entities, events, assets)
 		x = PlanetData.TileSize / 2,
 		y = PlanetData.TileSize / 2
 	}
+
+	self.events:subscribe ("BuildModeStartEvent", self)
+
+	self.build_question = {
+		msg = "BUILD?!",
+		x = 500, y = 700
+	}
+	self.abort_question = {
+		msg = "ABORT?!",
+		x = 600, y = 700
+	}
+
+	self.question_font = love.graphics.newFont (21)
 end
 
 function BuildModeProcessor:onUpdate (dt)
@@ -39,7 +52,7 @@ function BuildModeProcessor:onUpdate (dt)
 		end
 	end
 
-	self.rating = self:calculateRating(self.buildmap)
+	self.rating = self:calculateRating(self.currentPlanet)
 end
 
 function BuildModeProcessor:onRender ()
@@ -47,7 +60,14 @@ function BuildModeProcessor:onRender ()
 		return
 	end
 
+	local fontbuffer = love.graphics.getFont ()
+	love.graphics.setFont (self.question_font)
+
 	love.graphics.print ("total: " .. self.total.." rating: "..self.rating, self.mapOffset.x, 680)
+
+	love.graphics.print (self.build_question.msg, self.build_question.x, self.build_question.y)
+	love.graphics.print (self.abort_question.msg, self.abort_question.x, self.abort_question.y)
+	love.graphics.setFont (fontbuffer)
 end
 
 function BuildModeProcessor:handle (event)
@@ -162,15 +182,17 @@ function BuildModeProcessor:endBuildMode (event)
 	self.events:unsubscribe ("MouseMovedEvent", self)
 	self.events:unsubscribe ("MouseButtonDownEvent", self)
 	self.events:unsubscribe ("MouseButtonUpEvent", self)
+
+	self.events:push (PlanetOverviewStartEvent ())
 end
 
-function BuildModeProcessor:calculateRating (buildmap)
+function BuildModeProcessor:calculateRating (planet)
 	local difficulty = 0
 	local attractiveness = 0
 	for y = 1, PlanetData.MapSize.Height do
 		for x = 1, PlanetData.MapSize.Width do
-			difficulty = difficulty + buildmap[y][x].difficulty
-			attractiveness = attractiveness + buildmap[y][x].attractiveness
+			difficulty = difficulty + planet.map[y][x].difficulty
+			attractiveness = attractiveness + planet.map[y][x].attractiveness
 		end
 	end
 	local mapSize = PlanetData.MapSize.Width * PlanetData.MapSize.Height
@@ -181,7 +203,7 @@ function BuildModeProcessor:calculateRating (buildmap)
 	local maximumDifficulty = maxDif * mapSize
 	return attractiveness
 		* (1 - (difficulty / maximumDifficulty))
-		* self.currentPlanet.biome.attractiveness
+		* planet.biome.attractiveness
 end
 
 function BuildModeProcessor:checkHover (event)
@@ -229,7 +251,59 @@ function BuildModeProcessor:isMapTile (event)
 	return self.hoveredTilePosition
 end
 
+function BuildModeProcessor:checkIfTextIsClicked (event)
+	local font = self.question_font
+
+	if
+		self.abort_question.x < event.position.x
+		and event.position.x < (self.abort_question.x + font:getWidth (self.abort_question.msg))
+		and self.abort_question.y < event.position.y
+		and event.position.y < (self.abort_question.y + font:getHeight ())
+	then
+		return self.abort_question.msg
+	end
+
+	if
+		self.build_question.x < event.position.x
+		and event.position.x < (self.build_question.x + font:getWidth (self.build_question.msg))
+		and self.build_question.y < event.position.y
+		and event.position.y < (self.build_question.y + font:getHeight ())
+	then
+		return self.build_question.msg
+	end
+
+	return false
+end
+
 function BuildModeProcessor:onMousedown (event)
+	-- check if abort or build is clicked
+	local gd = self.entities:getData (
+		self.entities:firstEntityWithTag ({"gamedata"}),
+		GameData:getClass ()
+	)
+
+	local arrrrghButton = self:checkIfTextIsClicked (event)
+	if arrrrghButton then
+		if arrrrghButton == self.abort_question.msg then
+			gd.lastmsg = "Abort is better then ..."
+			self:endBuildMode (nil)
+			return
+		end
+		if arrrrghButton == self.build_question.msg then
+			-- update shit
+
+			if self.total <= gd.money then
+				gd.money = gd.money - self.total
+				self.currentPlanet.map = self.buildmap
+				gd.lastmsg = "You bought a lot of fancy shizzle!"
+			else
+				gd.lastmsg = "Y U NOT HAZ ENOUGH MONEYZ"
+			end
+			self:endBuildMode (nil)
+			return
+		end
+	end
+
 	-- check if menu is clicked
 	local tileButton = self:isMenuButton (event)
 	if tileButton then

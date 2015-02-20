@@ -58,13 +58,18 @@ function Game:Game ()
 	self.gd =
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
+	self.gd.lastmsg = ""
 	self.gd.resolution = {w = 1280, h = 920}
 	self.gd.population = 100000
-	self.gd.money = 0
+	self.gd.money = 120000
 	self.gd.planets["Knurpsel1"] = PlanetData (PlanetData.Biomes.Tundra)
+	self.gd.planets["Knurpsel1"].name = "Knurpsel1"
 	self.gd.planets["Knurpsel2"] = PlanetData (PlanetData.Biomes.Tropical)
+	self.gd.planets["Knurpsel2"].name = "Knurpsel2"
 	self.gd.planets["Knurpsel3"] = PlanetData (PlanetData.Biomes.Grassland)
+	self.gd.planets["Knurpsel3"].name = "Knurpsel3"
 	self.gd.planets["Knurpsel4"] = PlanetData (PlanetData.Biomes.Temperate)
+	self.gd.planets["Knurpsel4"].name = "Knurpsel4"
 
 	self.buildModeProcessor =
 		BuildModeProcessor (self.entities, self.events, self.assets)
@@ -73,7 +78,6 @@ function Game:Game ()
 	self.planetOverviewProcessor =
 		PlanetOverviewProcessor (self.entities, self.events, self.assets)
 	local e = PlanetOverviewStartEvent ()
-	print (inspect (e.getClass))
 	self.planetOverviewProcessor:handle (e)
 
 	self.animationProcessor = AnimationProcessor (self.entities, self.assets)
@@ -101,11 +105,12 @@ function Game:onUpdate (dt)
 
 	self.buildModeProcessor:onUpdate (dt)
 	self.inputProcessor:onUpdate (dt)
+	self.planetOverviewProcessor:onUpdate (dt)
 
 	local moneyfactor = 10
 	for _,planet in pairs(self.gd.planets) do
 		if planet.bought then
-			local rating = self.buildModeProcessor:calculateRating (planet.map)
+			local rating = self.buildModeProcessor:calculateRating (planet)
 			self.gd.money = self.gd.money + rating * dt * moneyfactor
 		end
 	end
@@ -116,8 +121,10 @@ function Game:onRender ()
 	self.buildModeProcessor:onRender ()
 	self.animationProcessor:onRender ()
 	self.inputProcessor:onRender ()
+	self.planetOverviewProcessor:onRender ()
 
 	love.graphics.print ("money: " .. self.gd.money, 32, 720)
+	love.graphics.print ("last message: " .. self.gd.lastmsg, 32, 780)
 end
 
 -- Gets called when game exits. May be used to do some clean up.
