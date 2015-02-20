@@ -24,14 +24,14 @@ end
 PlanetData.Biomes = {}
 addBiome (PlanetData.Biomes, 100000, 1.0, "Grassland", "Grass")
 addBiome (PlanetData.Biomes, 150000, 1.5, "Tropical", "Bush")
-addBiome (PlanetData.Biomes, 120000, 1.2, "Temperate", "Plane")
+addBiome (PlanetData.Biomes, 120000, 1.2, "Temperate", "Plain")
 addBiome (PlanetData.Biomes,  90000, 0.9, "Tundra", "Barren")
 
 PlanetData.TileType = {}
 -- defaults for biomes
 addTileType (PlanetData.TileType, 1500, 0.5, 1, "Grass")
 addTileType (PlanetData.TileType, 1500, 0.5, 1, "Bush")
-addTileType (PlanetData.TileType, 1500, 0.5, 1, "Plane")
+addTileType (PlanetData.TileType, 1500, 0.5, 1, "Plain")
 addTileType (PlanetData.TileType, 1000, 0.3, 1, "Barren")
 -- additional tiles to build
 addTileType (PlanetData.TileType,  250, 1.0, 1, "Start")

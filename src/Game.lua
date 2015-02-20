@@ -38,7 +38,7 @@ function Game:Game ()
 
 	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Grass")
 	self.assets:loadImage ("gfx/bush_tile.png", "gfx/tile/Bush")
-	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Plane")
+	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Plain")
 	self.assets:loadImage ("gfx/grass_tile.png", "gfx/tile/Barren")
 
 	self.assets:loadImage ("gfx/empty_tile.png", "gfx/tile/Empty")
