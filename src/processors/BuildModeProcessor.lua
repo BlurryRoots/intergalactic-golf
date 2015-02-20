@@ -53,12 +53,13 @@ end
 function BuildModeProcessor:handle (event)
 	local name = event:getClass ()
 
-	if "StartBuildModeEvent" == name then
+	if "BuildModeStartEvent" == name then
+		print ("starting")
 		self:startBuildMode (event)
 		return
 	end
 
-	if "EndBuildModeEvent" == name then
+	if "BuildModeEndEvent" == name then
 		self:endBuildMode (event)
 		return
 	end

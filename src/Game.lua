@@ -6,6 +6,8 @@ require ("src.EventManager")
 
 require ("src.events.BuildModeEndEvent")
 require ("src.events.BuildModeStartEvent")
+require ("src.events.PlanetOverviewStartEvent")
+require ("src.events.PlanetOverviewEndEvent")
 
 require ("src.data.AnimationData")
 require ("src.data.GameData")
@@ -16,6 +18,7 @@ require ("src.data.TransformData")
 require ("src.processors.AnimationProcessor")
 require ("src.processors.BuildModeProcessor")
 require ("src.processors.MovementProcessor")
+require ("src.processors.PlanetOverviewProcessor")
 require ("src.processors.PlayerInputProcessor")
 require ("src.processors.SoundProcessor")
 
@@ -48,19 +51,30 @@ function Game:Game ()
 	self.assets:loadImage ("gfx/sand_tile.png", "gfx/tile/Sand")
 	self.assets:loadImage ("gfx/start_tile.png", "gfx/tile/Start")
 
+	self.assets:loadImage ("gfx/planet.png", "gfx/Planet")
+	self.assets:loadImage ("gfx/bg.png", "gfx/Background")
+
 	self.entities = EntityManager ()
 	self.gd =
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
 
-	self.gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Temperate)
 	self.gd.population = 100000
 	self.gd.money = 0
-	self.gd.planets["Knurpsel"].bought = true
+	self.gd.planets["Knurpsel1"] = PlanetData (PlanetData.Biomes.Tundra)
+	self.gd.planets["Knurpsel2"] = PlanetData (PlanetData.Biomes.Tropical)
+	self.gd.planets["Knurpsel3"] = PlanetData (PlanetData.Biomes.Grassland)
+	self.gd.planets["Knurpsel4"] = PlanetData (PlanetData.Biomes.Temperate)
 
 	self.buildModeProcessor =
 		BuildModeProcessor (self.entities, self.events, self.assets)
-	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))
+	--self.buildModeProcessor:handle (BuildModeStartEvent ("Knurpsel4"))
+
+	self.planetOverviewProcessor =
+		PlanetOverviewProcessor (self.entities, self.events, self.assets)
+	local e = PlanetOverviewStartEvent ()
+	print (inspect (e.getClass))
+	self.planetOverviewProcessor:handle (e)
 
 	self.animationProcessor = AnimationProcessor (self.entities, self.assets)
 
