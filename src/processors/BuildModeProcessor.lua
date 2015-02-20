@@ -14,9 +14,19 @@ function BuildModeProcessor:BuildModeProcessor (entities, events, assets)
 	}
 
 	self.currentPlanet = nil
+	self.hoveredAnimation = nil
 end
 
 function BuildModeProcessor:onUpdate (dt)
+	if self.hoveredAnimation then
+		for y = 1, PlanetData.MapSize.Height do
+			for x = 1, PlanetData.MapSize.Width do
+				self.tileanimatios[y][x].color.g = 255
+			end
+		end
+
+		self.hoveredAnimation.color.g = 0
+	end
 end
 
 function BuildModeProcessor:onRender ()
@@ -107,12 +117,12 @@ function BuildModeProcessor:checkHover (event)
 		y = math.ceil ((event.position.y - self.mapOffset.y) / PlanetData.TileSize)
 	}
 
-	local hoversovermap =
-		0 < parts.x and parts.x <= PlanetData.MapSize.Width
-		and
-		0 < parts.y and parts.y <= PlanetData.MapSize.Height
+	local hoversovermap = 0 < parts.x and parts.x <= PlanetData.MapSize.Width
+		and 0 < parts.y and parts.y <= PlanetData.MapSize.Height
 
+	self.hoveredAnimation = nil
 	if hoversovermap then
-		self.tileanimatios[parts.y][parts.x].color.g = 0
+		--self.tileanimatios[parts.y][parts.x].color.g = 0
+		self.hoveredAnimation = self.tileanimatios[parts.y][parts.x]
 	end
 end
