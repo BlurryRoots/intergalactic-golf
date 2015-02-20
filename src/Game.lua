@@ -54,7 +54,7 @@ function Game:Game ()
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
 	gd.planets["Knurpsel"] = PlanetData ()
 
-	self.buildModeProcessor = BuildModeProcessor (self.entities, self.assets)
+	self.buildModeProcessor = BuildModeProcessor (self.entities, self.events, self.assets)
 	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))
 
 	self.animationProcessor = AnimationProcessor (self.entities, self.assets)

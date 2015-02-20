@@ -15,13 +15,13 @@ function AnimationData:AnimationData (key, frames, duration, offset, rotation, s
 	-- rotation relative to the transform in the world
 	self.rotation = rotation or 0
 	-- scale relative the transform in the world
-	self.scale = scale or 1
+	self.scale = scale or {x = 1, y = 1}
 	-- to build up a composite structure (tree)
 	self.children = {}
 	-- should it be rendered?
 	self.visible = true
 	-- color to render the animation in
-	self.color = color
+	self.color = color or {r = 255, g = 255, b = 255, a = 255}
 end
 
 function AnimationData:addChild (animation)

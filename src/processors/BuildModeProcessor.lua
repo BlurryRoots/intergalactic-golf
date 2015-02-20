@@ -3,15 +3,40 @@ require ("lib.yanecos.Processor")
 
 class "BuildModeProcessor" ("Processor")
 
-function BuildModeProcessor:BuildModeProcessor (entityManager, assets)
-	self.entities = entityManager
+function BuildModeProcessor:BuildModeProcessor (entities, events, assets)
+	self.entities = entities
+	self.events = events
 	self.assets = assets
+
+	self.mapOffset = {
+		x = PlanetData.TileSize / 2,
+		y = PlanetData.TileSize / 2
+	}
+
+	self.currentPlanet = nil
 end
 
 function BuildModeProcessor:onUpdate (dt)
 end
 
 function BuildModeProcessor:onRender ()
+end
+
+function BuildModeProcessor:handle (event)
+	local name = event:getClass ()
+	if "StartBuildModeEvent" == name then
+		self:startBuildMode (event)
+		return
+	end
+
+	if "EndBuildModeEvent" == name then
+		self:endBuildMode (event)
+		return
+	end
+
+	if "MouseMovedEvent" == name then
+		self:checkHover (event)
+	end
 end
 
 function BuildModeProcessor:startBuildMode (event)
@@ -21,17 +46,21 @@ function BuildModeProcessor:startBuildMode (event)
 	)
 
 	-- add map tiles
-	local planet = gd.planets[event.planetName]
+	self.currentPlanet = event.planetName
+	local planet = gd.planets[self.currentPlanet]
 	assert (planet, "no planet called " .. event.planetName)
 
+	self.tileids = {}
 	for y = 1, PlanetData.MapSize.Height do
+		self.tileids[y] = {}
 		for x = 1, PlanetData.MapSize.Width do
 			local eid = self.entities:createEntity ({"map-tiles"})
+			self.tileids[y][x] = eid
 
 			local transform = self.entities:addData (eid, TransformData ())
 			local tile = planet.map[y][x]
-			transform.x = x * PlanetData.TileSize
-			transform.y = y * PlanetData.TileSize
+			transform.x = (x - 1) * PlanetData.TileSize + self.mapOffset.x
+			transform.y = (y - 1) * PlanetData.TileSize + self.mapOffset.y
 
 			local key = "gfx/tile/" .. tile.name
 			local animation = self.entities:addData (eid, AnimationData (key))
@@ -42,6 +71,8 @@ function BuildModeProcessor:startBuildMode (event)
 			)
 		end
 	end
+
+	self.events:subscribe ("MouseMovedEvent", self)
 end
 
 function BuildModeProcessor:endBuildMode (event)
@@ -55,16 +86,29 @@ function BuildModeProcessor:endBuildMode (event)
 	for _, eid in pairs (tiles) do
 		self.entities:deleteEntity (eid)
 	end
+
+	self.events:unsubscribe ("MouseMovedEvent", self)
 end
 
-function BuildModeProcessor:handle (event)
-	if "StartBuildModeEvent" == event:getClass () then
-		self:startBuildMode (event)
-		return
-	end
+local inspect = require ("lib.inspect")
+function BuildModeProcessor:checkHover (event)
+	local parts = {
+		x = math.ceil ((event.position.x - self.mapOffset.x) / PlanetData.TileSize),
+		y = math.ceil ((event.position.y - self.mapOffset.y) / PlanetData.TileSize)
+	}
 
-	if "EndBuildModeEvent" == event:getClass () then
-		self:endBuildMode (event)
-		return
+	local hoversovermap =
+		0 < parts.x and parts.x <= PlanetData.MapSize.Width
+		and
+		0 < parts.y and parts.y <= PlanetData.MapSize.Height
+
+	if hoversovermap then
+		print ("hovering over " .. parts.x .. ":" .. parts.y)
+		local animation = self.entities:getData (
+			self.tileids[parts.y][parts.x],
+			AnimationData:getClass ()
+		)
+		assert (animation, "No no no animation")
+		animation.color.g = 0
 	end
 end

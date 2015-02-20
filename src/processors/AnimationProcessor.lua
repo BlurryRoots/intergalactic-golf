@@ -45,25 +45,29 @@ function AnimationProcessor:renderAnimationTree (animation)
 	love.graphics.push ()
 		-- rotate around the center of the ship (position)
 		love.graphics.translate (offset.x, offset.y)
-			love.graphics.scale (animation.scale)
+			love.graphics.scale (animation.scale.x, animation.scale.y)
 			love.graphics.rotate (animation.rotation)
 
-			local r, g, b, a = love.graphics.getColor ()
-			if animation.color then
-				love.graphics.setColor (
-					animation.color.r,
-					animation.color.g,
-					animation.color.b,
-					animation.color.a
-				)
+			if animation.visible then
+				local r, g, b, a = love.graphics.getColor ()
+				if animation.color then
+					love.graphics.setColor (
+						animation.color.r,
+						animation.color.g,
+						animation.color.b,
+						animation.color.a
+					)
+				end
+				love.graphics.draw (image, 0, 0)
+				love.graphics.setColor (r, g, b, a)
+			else
+				print ("im invisible ")
 			end
-			love.graphics.draw (image, 0, 0)
-			love.graphics.setColor (r, g, b, a)
 
 			for _, child in pairs (animation.children) do
-				if child.visible then
+				--if child.visible then
 					self:renderAnimationTree (child)
-				end
+				--end
 			end
 		love.graphics.translate (-offset.x, -offset.y)
 	love.graphics.pop()
