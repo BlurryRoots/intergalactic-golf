@@ -1,3 +1,13 @@
+require ("src.events.FocusGainedEvent")
+require ("src.events.FocusLostEvent")
+require ("src.events.KeyboardKeyDownEvent")
+require ("src.events.KeyboardKeyUpEvent")
+require ("src.events.MouseButtonDownEvent")
+require ("src.events.MouseButtonUpEvent")
+require ("src.events.MouseMovedEvent")
+require ("src.events.PlaySoundEvent")
+require ("src.events.ResizeEvent")
+
 require ("src.Game")
 
 local gameInstance = nil
@@ -36,6 +46,10 @@ end
 
 function love.mousereleased (x, y, button)
 	gameInstance:raise (MouseButtonUpEvent (x, y, button))
+end
+
+function love.mousemoved(x, y, dx, dy)
+	gameInstance:raise (MouseMovedEvent (x, y, dx, dy))
 end
 
 function love.keypressed (key)

@@ -14,7 +14,7 @@ end
 function PlayerInputProcessor:handle (event)
 	local name = event:getClass ()
 
-	if "KeyboardKeyUpEvent" == name then
+	if "KeyboardKeyDownEvent" == name then
 		self:onKeydown (event)
 		return
 	end
@@ -33,12 +33,14 @@ function PlayerInputProcessor:handle (event)
 		self:onMouseup (event)
 		return
 	end
+
+	if "MouseMovedEvent" == name then
+		self:onMousemoved (event)
+		return
+	end
 end
 
 function PlayerInputProcessor:onKeydown (event)
-	if "escape" == event.key then
-		love.event.quit()
-	end
 end
 
 function PlayerInputProcessor:onKeyup (event)
@@ -48,13 +50,12 @@ function PlayerInputProcessor:onKeyup (event)
 end
 
 function PlayerInputProcessor:onMousedown (event)
-	if "escape" == event.key then
-		love.event.quit()
-	end
 end
 
 function PlayerInputProcessor:onMouseup (event)
-	if "escape" == event.key then
-		love.event.quit()
+end
+
+function PlayerInputProcessor:onMousemoved (event)
+	if event.delta.x > 1 then
 	end
 end

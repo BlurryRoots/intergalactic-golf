@@ -6,14 +6,6 @@ require ("src.EventManager")
 
 require ("src.events.BuildModeEndEvent")
 require ("src.events.BuildModeStartEvent")
-require ("src.events.FocusGainedEvent")
-require ("src.events.FocusLostEvent")
-require ("src.events.KeyboardKeyDownEvent")
-require ("src.events.KeyboardKeyUpEvent")
-require ("src.events.MouseButtonDownEvent")
-require ("src.events.MouseButtonUpEvent")
-require ("src.events.PlaySoundEvent")
-require ("src.events.ResizeEvent")
 
 require ("src.data.AnimationData")
 require ("src.data.GameData")
@@ -72,6 +64,7 @@ function Game:Game ()
 	self.events:subscribe ("KeyboardKeyUpEvent", self.inputProcessor)
 	self.events:subscribe ("MouseButtonDownEvent", self.inputProcessor)
 	self.events:subscribe ("MouseButtonUpEvent", self.inputProcessor)
+	self.events:subscribe ("MouseMovedEvent", self.inputProcessor)
 end
 
 -- Raises (queues) a new event
