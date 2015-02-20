@@ -53,6 +53,7 @@ function Game:Game ()
 		self.entities
 			:addData (self.entities:createEntity ({"gamedata"}), GameData ())
 	gd.planets["Knurpsel"] = PlanetData (PlanetData.Biomes.Tropical)
+	gd.population = 100000
 
 	self.buildModeProcessor = BuildModeProcessor (self.entities, self.events, self.assets)
 	self.buildModeProcessor:startBuildMode (BuildModeStartEvent ("Knurpsel"))

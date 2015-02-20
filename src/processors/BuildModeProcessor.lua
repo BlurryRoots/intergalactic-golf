@@ -21,12 +21,12 @@ function BuildModeProcessor:onUpdate (dt)
 
 	for y = 1, PlanetData.MapSize.Height do
 		for x = 1, PlanetData.MapSize.Width do
-			self.tileanimatios[y][x].color.g = 255
+			self.tileanimations[y][x].color.g = 255
 		end
 	end
 
 	if self.hoveredTilePosition then
-		self.tileanimatios[self.hoveredTilePosition.y][self.hoveredTilePosition.x]
+		self.tileanimations[self.hoveredTilePosition.y][self.hoveredTilePosition.x]
 			.color.g = 0
 	end
 
@@ -38,6 +38,18 @@ function BuildModeProcessor:onUpdate (dt)
 			end
 		end
 	end
+
+	self.rating = 0
+	local difficulty = 0
+	local attractiveness = 0
+	for y = 1, PlanetData.MapSize.Height do
+		for x = 1, PlanetData.MapSize.Width do
+			difficulty = difficulty + self.buildmap[y][x].difficulty
+			attractiveness = attractiveness + self.buildmap[y][x].attractiveness
+		end
+	end
+	local mapSize = PlanetData.MapSize.Width * PlanetData.MapSize.Height
+	self.rating = self:CalculateRating(difficulty, attractiveness, mapSize) * self.currentPlanet.biome.attractiveness
 end
 
 function BuildModeProcessor:onRender ()
@@ -45,7 +57,7 @@ function BuildModeProcessor:onRender ()
 		return
 	end
 
-	love.graphics.print ("total: " .. self.total, self.mapOffset.x, 700)
+	love.graphics.print ("total: " .. self.total.." rating: "..self.rating, self.mapOffset.x, 680)
 end
 
 function BuildModeProcessor:handle (event)
@@ -108,9 +120,9 @@ function BuildModeProcessor:startBuildMode (event)
 		self.entities:addData (bg, AnimationData ("gfx/tile/Empty"))
 	bganimation.color.a = 64
 
-	self.tileanimatios = {}
+	self.tileanimations = {}
 	for y = 1, PlanetData.MapSize.Height do
-		self.tileanimatios[y] = {}
+		self.tileanimations[y] = {}
 		for x = 1, PlanetData.MapSize.Width do
 			local tile = self.currentPlanet.map[y][x]
 			local key = "gfx/tile/" .. tile.name
@@ -118,7 +130,7 @@ function BuildModeProcessor:startBuildMode (event)
 			ani.offset.x = x - 1
 			ani.offset.y = y - 1
 
-			self.tileanimatios[y][x] = ani
+			self.tileanimations[y][x] = ani
 		end
 	end
 
@@ -153,12 +165,21 @@ function BuildModeProcessor:endBuildMode (event)
 		self.entities:deleteEntity (eid)
 	end
 	-- free shortcut lists
-	self.tileanimatios = nil
+	self.tileanimations = nil
 	self.tilemenu = nil
 
 	self.events:unsubscribe ("MouseMovedEvent", self)
 	self.events:unsubscribe ("MouseButtonDownEvent", self)
 	self.events:unsubscribe ("MouseButtonUpEvent", self)
+end
+
+function BuildModeProcessor:CalculateRating (difficulty, attractiveness, mapSize)
+	local maxDif = 0
+	for _, tile in pairs (PlanetData.TileType) do
+		if maxDif < tile.difficulty then maxDif = tile.difficulty end
+	end
+	local maximumDifficulty = maxDif * mapSize
+	return attractiveness * (maximumDifficulty / difficulty)
 end
 
 function BuildModeProcessor:checkHover (event)
@@ -225,7 +246,7 @@ function BuildModeProcessor:onMousedown (event)
 		-- set tile type to selected type
 		self.buildmap[tilePos.y][tilePos.x] = PlanetData.TileType[self.currentTileToBuild]
 		-- set visual type
-		self.tileanimatios[tilePos.y][tilePos.x].key =
+		self.tileanimations[tilePos.y][tilePos.x].key =
 			"gfx/tile/" .. self.buildmap[tilePos.y][tilePos.x].name
 		return
 	end
