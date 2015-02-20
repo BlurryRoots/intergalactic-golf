@@ -50,25 +50,25 @@ function BuildModeProcessor:startBuildMode (event)
 	local planet = gd.planets[self.currentPlanet]
 	assert (planet, "no planet called " .. event.planetName)
 
-	self.tileids = {}
+	-- add tile menu
+	local bg = self.entities:createEntity ({"build-menu"})
+
+	self.entities:addData (bg, TransformData (self.mapOffset.x, self.mapOffset.y))
+	local bganimation =
+		self.entities:addData (bg, AnimationData ("gfx/tile/Empty"))
+	bganimation.color.a = 64
+
+	self.tileanimatios = {}
 	for y = 1, PlanetData.MapSize.Height do
-		self.tileids[y] = {}
+		self.tileanimatios[y] = {}
 		for x = 1, PlanetData.MapSize.Width do
-			local eid = self.entities:createEntity ({"map-tiles"})
-			self.tileids[y][x] = eid
-
-			local transform = self.entities:addData (eid, TransformData ())
 			local tile = planet.map[y][x]
-			transform.x = (x - 1) * PlanetData.TileSize + self.mapOffset.x
-			transform.y = (y - 1) * PlanetData.TileSize + self.mapOffset.y
-
 			local key = "gfx/tile/" .. tile.name
-			local animation = self.entities:addData (eid, AnimationData (key))
+			local ani = bganimation:addChild (AnimationData (key))
+			ani.offset.x = x - 1
+			ani.offset.y = y - 1
 
-			local hitbox = self.entities:addData (
-				eid,
-				HitboxData (PlanetData.TileSize, PlanetData.TileSize)
-			)
+			self.tileanimatios[y][x] = ani
 		end
 	end
 
@@ -82,15 +82,15 @@ function BuildModeProcessor:endBuildMode (event)
 	)
 
 	-- get all map tiles and delete them
-	local tiles = self.entities:findEntitiesWithTag ({"map-tiles"})
+	local tiles = self.entities:findEntitiesWithTag ({"build-menu"})
 	for _, eid in pairs (tiles) do
 		self.entities:deleteEntity (eid)
 	end
+	self.tileanimatios = nil
 
 	self.events:unsubscribe ("MouseMovedEvent", self)
 end
 
-local inspect = require ("lib.inspect")
 function BuildModeProcessor:checkHover (event)
 	local parts = {
 		x = math.ceil ((event.position.x - self.mapOffset.x) / PlanetData.TileSize),
@@ -103,12 +103,6 @@ function BuildModeProcessor:checkHover (event)
 		0 < parts.y and parts.y <= PlanetData.MapSize.Height
 
 	if hoversovermap then
-		print ("hovering over " .. parts.x .. ":" .. parts.y)
-		local animation = self.entities:getData (
-			self.tileids[parts.y][parts.x],
-			AnimationData:getClass ()
-		)
-		assert (animation, "No no no animation")
-		animation.color.g = 0
+		self.tileanimatios[parts.y][parts.x].color.g = 0
 	end
 end
